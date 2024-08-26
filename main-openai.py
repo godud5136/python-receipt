@@ -4,7 +4,6 @@ import base64
 import json
 import time
 import openai
-import clipboard
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -64,10 +63,6 @@ def analyze_receipt(texts):
 
     return cleaned_analysis
 
-def copy_to_clipboard(text):
-    # 클립보드로 텍스트를 복사하는 함수
-    clipboard.copy(text)
-    st.success("텍스트가 클립보드에 복사되었습니다.")
 
 def main():
     st.title("Clova OCR API with Streamlit and ChatGPT Analysis")
@@ -139,22 +134,6 @@ def main():
                                 "total_amount": total_amount,
                             })
 
-                            # for idx, output in enumerate(unique_key):
-                            #     st.write(purchase_date)
-
-                            #     if st.button(purchase_date):
-                            #         copy_to_clipboard(purchase_date)
-                                # if st.button(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_이해영", key=f"lunch_{idx}"):
-                                #     copy_to_clipboard(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_이해영")
-
-                                # if st.button(str(output["total_amount"]), key=f"amount_{idx}"):
-                                #     copy_to_clipboard(str(output["total_amount"]))
-
-
-                                # if st.button(output["store_name"], key=f"store_{idx}"):
-                                #     copy_to_clipboard(output["store_name"])
-
-
                             st.session_state.analysis_done = True
                             
                         except json.JSONDecodeError:
@@ -167,16 +146,9 @@ def main():
         for idx, output in enumerate(st.session_state["result"]):
             st.write(output["fileName"])
 
-            if st.button(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", key=f"lunch_{idx}"):
-                copy_to_clipboard(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익")
-
-            if st.button(str(output["total_amount"]), key=f"amount_{idx}"):
-                copy_to_clipboard(str(output["total_amount"]))
-
-
-            if st.button(output["store_name"], key=f"store_{idx}"):
-                copy_to_clipboard(output["store_name"])
-
+            st.code(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", language="python")
+            st.code(str(output["total_amount"]))
+            st.code(output["store_name"])
 
 
 if __name__ == "__main__":
