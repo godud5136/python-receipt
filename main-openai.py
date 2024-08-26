@@ -5,13 +5,15 @@ import json
 import time
 import openai
 import pyperclip
+from openai import OpenAI
 
 # from dotenv import load_dotenv
 # import os
 
 # load_dotenv()
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def clova_ocr_request(image_data):
     # 이미지 데이터를 BASE64로 인코딩
@@ -51,7 +53,7 @@ def extract_text_from_ocr_result(ocr_result):
 def analyze_receipt(texts):
     receipt_text = ' '.join(texts)
     
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant to analyze the purchase date, store name, and total amount from the receipt and output it in JSON format"},
