@@ -2,5 +2,3 @@ openai==0.28
 pyperclip
 python-dotenv
 streamlit
-gtk
-PyQt4
