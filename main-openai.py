@@ -4,7 +4,7 @@ import base64
 import json
 import time
 import openai
-import pyperclip
+import clipboard
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -56,6 +56,8 @@ def analyze_receipt(texts):
 
     analysis = response.choices[0].message['content']
 
+    print('analysis', analysis)
+
     # JSON 포맷의 시작과 끝을 제거하고, 문자열을 정리하여 리턴
     cleaned_analysis = analysis.strip("```json").strip("```")
     
@@ -64,8 +66,9 @@ def analyze_receipt(texts):
 
 def copy_to_clipboard(text):
     # 클립보드로 텍스트를 복사하는 함수
-    pyperclip.copy(text)
-    pyperclip.paste()
+    clipboard.copy(text)
+    # pyperclip.copy(text)
+    # pyperclip.paste()
     st.success("텍스트가 클립보드에 복사되었습니다.")
 
 def main():
