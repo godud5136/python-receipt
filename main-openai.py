@@ -6,13 +6,7 @@ import time
 import openai
 import pyperclip
 
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-# openai.api_key = st.secrets["OPENAI_API_KEY"]
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def clova_ocr_request(image_data):
     # 이미지 데이터를 BASE64로 인코딩
@@ -34,12 +28,12 @@ def clova_ocr_request(image_data):
     }
 
     headers = {
-        "X-OCR-SECRET": os.getenv("CLOVA_OCR_SECRET_KEY"),
+        "X-OCR-SECRET": st.secrets["CLOVA_OCR_SECRET_KEY"],
         "Content-Type": "application/json"
     }
 
     # Clova OCR API 호출
-    response = requests.post(os.getenv("CLOVA_OCR_API_URL"), headers=headers, data=json.dumps(request_data))
+    response = requests.post(st.secrets["CLOVA_OCR_API_URL"], headers=headers, data=json.dumps(request_data))
     return response.json()
 
 def extract_text_from_ocr_result(ocr_result):
