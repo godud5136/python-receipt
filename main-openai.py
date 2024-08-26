@@ -67,8 +67,6 @@ def analyze_receipt(texts):
 def copy_to_clipboard(text):
     # 클립보드로 텍스트를 복사하는 함수
     clipboard.copy(text)
-    # pyperclip.copy(text)
-    # pyperclip.paste()
     st.success("텍스트가 클립보드에 복사되었습니다.")
 
 def main():
