@@ -60,7 +60,12 @@ def analyze_receipt(texts):
     )
 
     analysis = response.choices[0].message['content']
-    return analysis
+
+    # JSON 포맷의 시작과 끝을 제거하고, 문자열을 정리하여 리턴
+    cleaned_analysis = analysis.strip("```json").strip("```")
+    
+
+    return cleaned_analysis
 
 def copy_to_clipboard(text):
     # 클립보드로 텍스트를 복사하는 함수
@@ -165,8 +170,8 @@ def main():
         for idx, output in enumerate(st.session_state["result"]):
             st.write(output["fileName"])
 
-            if st.button(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_이해영", key=f"lunch_{idx}"):
-                copy_to_clipboard(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_이해영")
+            if st.button(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", key=f"lunch_{idx}"):
+                copy_to_clipboard(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익")
 
             if st.button(str(output["total_amount"]), key=f"amount_{idx}"):
                 copy_to_clipboard(str(output["total_amount"]))
