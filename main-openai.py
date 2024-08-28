@@ -4,6 +4,7 @@ import base64
 import json
 import time
 import openai
+from datetime import datetime
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -44,12 +45,21 @@ def extract_text_from_ocr_result(ocr_result):
 
 def analyze_receipt(texts):
     receipt_text = ' '.join(texts)
+
+    # GPT에게 커피 관련 항목을 분석하도록 지시하는 프롬프트 추가
+    prompt = (
+        f"Please analyze the following receipt data: {receipt_text}. "
+        "Extract the purchase date in YYMMDD format, store name, and total amount. "
+        "Also, determine if this receipt includes any coffee-related purchases (e.g., coffee, latte, espresso). "
+        "If there is a coffee-related purchase, set the key 'coffee' to true, otherwise set it to false. "
+        "Format the total amount without commas."
+    )
     
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant to analyze the purchase date, store name, and total amount from the receipt and output it in JSON format"},
-            {"role": "user", "content": f"Please analyze the following receipt data: {receipt_text}. purchase date, store name, and total amount, and Extract the purchase date in YYMMDD format, and format the total amount without commas."},
+            {"role": "user", "content": prompt},
         ]
     )
 
@@ -59,15 +69,10 @@ def analyze_receipt(texts):
 
     # JSON 포맷의 시작과 끝을 제거하고, 문자열을 정리하여 리턴
     cleaned_analysis = analysis.strip("```json").strip("```")
-    
 
     return cleaned_analysis
 
-
 def main():
-    st.title("Clova OCR API with Streamlit and ChatGPT Analysis")
-    st.write("이미지를 업로드하여 텍스트 인식과 영수증 분석을 수행합니다.")
-
     if 'ctr' not in st.session_state:
         st.session_state['ctr'] = 0
 
@@ -123,8 +128,21 @@ def main():
                             analysis_dict = json.loads(analysis_result)
 
                             purchase_date = analysis_dict.get('purchase_date', 'N/A')
+
+                            # purchase_date가 YYYY-MM-DD 형식이면 YYMMDD 형식으로 변환
+                            if purchase_date != 'N/A' and '-' in purchase_date:
+                                try:
+                                    # YYYY-MM-DD 형식으로 파싱
+                                    parsed_date = datetime.strptime(purchase_date, "%Y-%m-%d")
+                                    # YYMMDD 형식으로 변환
+                                    purchase_date = parsed_date.strftime("%y%m%d")
+                                except ValueError:
+                                    # 예상치 못한 날짜 형식일 경우 그대로 유지
+                                    pass
+
                             store_name = analysis_dict.get('store_name', 'N/A')
                             total_amount = analysis_dict.get('total_amount', 'N/A')
+                            coffee = analysis_dict.get('coffee', 'N/A')
 
                             st.session_state["result"].append({
                                 "fileId": img_file.file_id,
@@ -132,6 +150,7 @@ def main():
                                 "purchase_date": purchase_date,
                                 "store_name": store_name,
                                 "total_amount": total_amount,
+                                "coffee": coffee,
                             })
 
                             st.session_state.analysis_done = True
@@ -143,13 +162,16 @@ def main():
 
 
     if st.session_state.analysis_done:
-        for idx, output in enumerate(st.session_state["result"]):
+        for _, output in enumerate(st.session_state["result"]):
             st.write(output["fileName"])
 
-            st.code(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", language="python")
+            if output["coffee"] == True:
+                st.code(f"간식비_{output['total_amount']}_{output['purchase_date']}_서비스운영본부", language="python")
+            else:
+                st.code(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", language="python")
+
             st.code(str(output["total_amount"]))
             st.code(output["store_name"])
-
 
 if __name__ == "__main__":
     main()
