@@ -165,10 +165,10 @@ def main():
         for _, output in enumerate(st.session_state["result"]):
             st.write(output["fileName"])
 
-            if output["coffee"] == True:
-                st.code(f"간식비_{output['total_amount']}_{output['purchase_date']}_서비스운영본부", language="python")
-            else:
-                st.code(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", language="python")
+            # if output["coffee"] == True:
+            st.code(f"간식비_{output['total_amount']}_{output['purchase_date']}_서비스운영본부", language="python")
+            # else:
+            #     st.code(f"식비_점심_{output['total_amount']}_{output['purchase_date']}_김재익", language="python")
 
             st.code(str(output["total_amount"]))
             st.code(output["store_name"])
